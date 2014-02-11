@@ -14,24 +14,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with ROX Center.  If not, see <http://www.gnu.org/licenses/>.
-class SettingsController < ApplicationController
-  before_filter :authenticate_user!
-  before_filter{ authorize! :manage, :settings }
-  before_filter :check_maintenance, only: [ :update ]
+class PurgeTestPayloadsJob
+  @queue = :purge
 
-  def show
-    render json: Settings::App.get
+  def self.perform
+    n = outdated_payloads(lifespan).delete_all
+    Rails.logger.info "Purged #{n} outdated test payloads"
   end
 
-  def update
-    settings = Settings::App.get
-    settings.update_attributes setting_params
-    render json: settings.tap(&:reload)
+  def self.outdated_report
+    lifespan = Settings.app.test_payloads_lifespan
+    OpenStruct.new name: :payloads, lifespan: lifespan * 24 * 3600 * 1000, total: outdated_payloads(lifespan).count
   end
 
-  private
-
-  def setting_params
-    params.require(:setting).permit(:ticketing_system_url, :reports_cache_size, :tag_cloud_size, :test_outdated_days, :test_payloads_lifespan)
+  def self.outdated_payloads lifespan
+    TestPayload.where(state: :processed).where 'received_at < ?', Time.now - lifespan * 24 * 3600
   end
 end

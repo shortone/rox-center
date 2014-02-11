@@ -219,6 +219,8 @@ this.Translations.en =
     tagCloudSizeInstructions: "maximum number of tags to show on the home page (1 or more)"
     testOutdatedDays: "Tests Outdated Days"
     testOutdatedDaysInstructions: "tests will be marked as outdated after this number of days (1 or more)"
+    testPayloadsLifespan: "Lifespan of Test Payloads"
+    testPayloadsLifespanInstructions: "payloads will be purged after this number of days (1 or more)"
     ticketingSystemUrl: "Ticketing System URL"
     save: "Save"
     error: "Could not save settings"
